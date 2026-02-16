@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  PM
+  INSTALLER
+}
+
+enum ProjectStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum MachineInstallStatus {
+  NOT_STARTED
+  PARTIAL
+  INSTALLED
+  BLOCKED
+}
+
+enum InstallOutcome {
+  OK
+  KO
+  PARTIAL
+}
+
+enum IssueType {
+  MISSING
+  PROBLEM
+  ANOMALY
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id               String       @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String       @unique
+  passwordHash     String
+  role             UserRole
+  managedProjects  Project[]    @relation("ProjectManager")
+  assignments      Assignment[]
+  reports          InstallationReport[]
+  createdIssues    Issue[]      @relation("IssueCreator")
+  assignedIssues   Issue[]      @relation("IssueAssignee")
+  chatMessages     ChatMessage[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model Project {
+  id              String       @id @default(cuid())
+  name            String
+  customer        String
+  location        String
+  startDate       DateTime
+  expectedEndDate DateTime?
+  status          ProjectStatus @default(SCHEDULED)
+  pmId            String
+  pm              User         @relation("ProjectManager", fields: [pmId], references: [id])
+  machines        Machine[]
+  assignments     Assignment[]
+  reports         InstallationReport[]
+  issues          Issue[]
+  chatMessages    ChatMessage[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Machine {
+  id                 String               @id @default(cuid())
+  model              String
+  serialNumber       String               @unique
+  projectId          String
+  project            Project              @relation(fields: [projectId], references: [id])
+  installationStatus MachineInstallStatus @default(NOT_STARTED)
+  notes              String?
+  reports            InstallationReport[]
+  issues             Issue[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model Assignment {
+  id           String   @id @default(cuid())
+  projectId    String
+  installerId  String
+  startDate    DateTime
+  endDate      DateTime?
+  project      Project  @relation(fields: [projectId], references: [id])
+  installer    User     @relation(fields: [installerId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([projectId, installerId, startDate])
+}
+
+model InstallationReport {
+  id            String         @id @default(cuid())
+  projectId     String
+  machineId     String
+  installerId   String
+  date          DateTime       @default(now())
+  outcome       InstallOutcome
+  notes         String?
+  project       Project        @relation(fields: [projectId], references: [id])
+  machine       Machine        @relation(fields: [machineId], references: [id])
+  installer     User           @relation(fields: [installerId], references: [id])
+  attachments   Attachment[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Issue {
+  id            String       @id @default(cuid())
+  type          IssueType
+  description   String
+  status        IssueStatus  @default(OPEN)
+  projectId     String
+  machineId     String?
+  createdById   String
+  assigneeId    String?
+  project       Project      @relation(fields: [projectId], references: [id])
+  machine       Machine?     @relation(fields: [machineId], references: [id])
+  createdBy     User         @relation("IssueCreator", fields: [createdById], references: [id])
+  assignee      User?        @relation("IssueAssignee", fields: [assigneeId], references: [id])
+  attachments   Attachment[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model ChatMessage {
+  id           String       @id @default(cuid())
+  projectId    String
+  senderId     String
+  message      String
+  project      Project      @relation(fields: [projectId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+  attachments  Attachment[]
+  createdAt    DateTime     @default(now())
+}
+
+model Attachment {
+  id          String                @id @default(cuid())
+  url         String
+  mimeType    String
+  fileName    String
+  sizeBytes   Int
+  issueId     String?
+  reportId    String?
+  chatId      String?
+  issue       Issue?                @relation(fields: [issueId], references: [id])
+  report      InstallationReport?   @relation(fields: [reportId], references: [id])
+  chatMessage ChatMessage?          @relation(fields: [chatId], references: [id])
+  createdAt   DateTime              @default(now())
+}

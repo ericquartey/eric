@@ -1,0 +1,63 @@
+
+> backend@0.0.1 start:dev
+> nest start --watch
+
+[2J[3J[H[[90m16:38:16[0m] Starting compilation in watch mode...
+
+[[90m16:38:20[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPrismaModule dependencies initialized[39m[38;5;3m +28ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +2ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mCommonModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mProjectsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMachinesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAssignmentsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReportsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mIssuesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAttachmentsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mChatModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mChatGateway subscribed to the "join_project" message[39m[38;5;3m +13ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mChatGateway subscribed to the "leave_project" message[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mChatGateway subscribed to the "send_message" message[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/api/health}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/health, GET} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAuthController {/api/auth}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/register, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/auth/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mUsersController {/api/users}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/users/me, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mProjectsController {/api/projects}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mMachinesController {/api/machines}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/machines, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/machines, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/machines/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/machines/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAssignmentsController {/api/assignments}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assignments, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assignments, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReportsController {/api/reports}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/reports, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mIssuesController {/api/issues}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/issues, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/issues, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/issues/:id/status, PATCH} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mChatController {/api/chat}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/chat/messages, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/chat/messages, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAttachmentsController {/api/attachments}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:23 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/attachments/upload, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 46792  - [39m16/02/2026, 16:38:24 [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +141ms[39m
