@@ -89,10 +89,25 @@ model Machine {
   project            Project              @relation(fields: [projectId], references: [id])
   installationStatus MachineInstallStatus @default(NOT_STARTED)
   notes              String?
+  warehouseId        String?
+  warehouse          Warehouse?           @relation(fields: [warehouseId], references: [id])
+  valueEur           Decimal              @default(0) @db.Decimal(12, 2)
   reports            InstallationReport[]
   issues             Issue[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
+}
+
+
+model Warehouse {
+  id           String    @id @default(cuid())
+  name         String
+  location     String
+  machines     Machine[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([name, location])
 }
 
 model Assignment {

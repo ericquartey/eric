@@ -14,6 +14,7 @@ import { IssuesModule } from './issues/issues.module';
 import { ChatModule } from './chat/chat.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { WarehousesModule } from './warehouses/warehouses.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ChatModule,
     AttachmentsModule,
     DashboardModule,
+    WarehousesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

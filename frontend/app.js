@@ -16,6 +16,7 @@ const elements = {
   registerForm: document.getElementById("registerForm"),
   createProjectForm: document.getElementById("createProjectForm"),
   createMachineForm: document.getElementById("createMachineForm"),
+  createWarehouseForm: document.getElementById("createWarehouseForm"),
   createIssueForm: document.getElementById("createIssueForm"),
   createAssignmentForm: document.getElementById("createAssignmentForm"),
   createReportForm: document.getElementById("createReportForm"),
@@ -25,6 +26,7 @@ const elements = {
   issuesBtn: document.getElementById("issuesBtn"),
   reportsBtn: document.getElementById("reportsBtn"),
   assignmentsBtn: document.getElementById("assignmentsBtn"),
+  warehousesBtn: document.getElementById("warehousesBtn"),
   meBtn: document.getElementById("meBtn"),
   projectsCount: document.getElementById("projectsCount"),
   machinesCount: document.getElementById("machinesCount"),
@@ -41,10 +43,12 @@ const elements = {
   issuesTable: document.getElementById("issuesTable"),
   reportsTable: document.getElementById("reportsTable"),
   assignmentsTable: document.getElementById("assignmentsTable"),
+  warehousesTable: document.getElementById("warehousesTable"),
   issuesKanban: document.getElementById("issuesKanban"),
   assignmentsTimeline: document.getElementById("assignmentsTimeline"),
   projectPmId: document.getElementById("projectPmId"),
   machineProjectId: document.getElementById("machineProjectId"),
+  machineWarehouseId: document.getElementById("machineWarehouseId"),
   issueProjectId: document.getElementById("issueProjectId"),
   issueMachineId: document.getElementById("issueMachineId"),
   assignmentProjectId: document.getElementById("assignmentProjectId"),
@@ -60,6 +64,7 @@ const state = {
   issues: [],
   reports: [],
   assignments: [],
+  warehouses: [],
   search: "",
   autoRefreshTimer: null,
 };
@@ -216,8 +221,13 @@ function syncDynamicInputs() {
     value: i.id,
     label: `${i.type} ${i.status} (${i.id})`,
   }));
+  const warehouses = state.warehouses.map((w) => ({
+    value: w.id,
+    label: `${w.name} (${w.location})`,
+  }));
 
   fillSelect(elements.machineProjectId, projects, "Project...");
+  fillSelect(elements.machineWarehouseId, warehouses, "Magazzino (opzionale)...");
   fillSelect(elements.issueProjectId, projects, "Project...");
   fillSelect(elements.assignmentProjectId, projects, "Project...");
   fillSelect(elements.reportProjectId, projects, "Project...");
@@ -309,6 +319,7 @@ function renderAll() {
   const issues = filterRows(state.issues);
   const reports = filterRows(state.reports);
   const assignments = filterRows(state.assignments);
+  const warehouses = filterRows(state.warehouses);
 
   renderTable(
     elements.projectsTable,
@@ -333,6 +344,8 @@ function renderAll() {
       { label: "Serial", value: (r) => r.serialNumber },
       { label: "Status", value: (r) => r.installationStatus },
       { label: "Project", value: (r) => r.project?.name || r.projectId },
+      { label: "Magazzino", value: (r) => r.warehouse?.name || "-" },
+      { label: "Valore EUR", value: (r) => r.valueEur },
       {
         label: "Azioni",
         raw: (r) =>
@@ -383,6 +396,18 @@ function renderAll() {
     assignments
   );
 
+  renderTable(
+    elements.warehousesTable,
+    [
+      { label: "Nome", value: (r) => r.name },
+      { label: "Location", value: (r) => r.location },
+      { label: "Macchine", value: (r) => r.machinesCount },
+      { label: "Valore EUR", value: (r) => r.valueEur },
+      { label: "Valore USD", value: (r) => r.valueUsd },
+    ],
+    warehouses
+  );
+
   renderKanban();
   renderTimeline();
   updateMetrics();
@@ -427,6 +452,10 @@ async function loadAssignments() {
   state.assignments = normalizeRows(await apiFetch("/assignments", { method: "GET" }));
 }
 
+async function loadWarehouses() {
+  state.warehouses = normalizeRows(await apiFetch("/warehouses", { method: "GET" }));
+}
+
 async function refreshAll() {
   try {
     await loadMe();
@@ -436,6 +465,7 @@ async function refreshAll() {
       loadIssues(),
       loadReports(),
       loadAssignments(),
+      loadWarehouses(),
     ]);
     renderAll();
     showApiOutput("Dati aggiornati.");
@@ -465,6 +495,7 @@ function exportSnapshot() {
       issues: state.issues.length,
       reports: state.reports.length,
       assignments: state.assignments.length,
+      warehouses: state.warehouses.length,
     },
     data: {
       me: state.me,
@@ -473,6 +504,7 @@ function exportSnapshot() {
       issues: state.issues,
       reports: state.reports,
       assignments: state.assignments,
+      warehouses: state.warehouses,
     },
   };
   const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
@@ -505,9 +537,12 @@ async function createMachine(formData) {
     model: String(formData.get("model") || ""),
     serialNumber: String(formData.get("serialNumber") || ""),
     projectId: String(formData.get("projectId") || ""),
+    warehouseId: String(formData.get("warehouseId") || ""),
+    valueEur: Number(formData.get("valueEur") || 0),
     installationStatus: String(formData.get("installationStatus") || "NOT_STARTED"),
     notes: String(formData.get("notes") || ""),
   };
+  if (!payload.warehouseId) delete payload.warehouseId;
   if (!payload.notes) delete payload.notes;
   return apiFetch("/machines", { method: "POST", body: JSON.stringify(payload) });
 }
@@ -547,6 +582,15 @@ async function createReport(formData) {
   return apiFetch("/reports", { method: "POST", body: JSON.stringify(payload) });
 }
 
+
+async function createWarehouse(formData) {
+  const payload = {
+    name: String(formData.get("name") || ""),
+    location: String(formData.get("location") || ""),
+  };
+  return apiFetch("/warehouses", { method: "POST", body: JSON.stringify(payload) });
+}
+
 function nextIssueStatus(current) {
   if (current === "OPEN") return "IN_PROGRESS";
   if (current === "IN_PROGRESS") return "RESOLVED";
@@ -581,6 +625,7 @@ function bindEvents() {
     state.issues = [];
     state.reports = [];
     state.assignments = [];
+    state.warehouses = [];
     elements.meOutput.textContent = "Nessun dato";
     updateTokenState();
     renderAll();
@@ -630,6 +675,19 @@ function bindEvents() {
       renderAll();
     } catch (error) {
       showApiOutput(`Create project error: ${error.message}`);
+    }
+  });
+
+  elements.createWarehouseForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      const created = await createWarehouse(new FormData(elements.createWarehouseForm));
+      showApiOutput({ action: "createWarehouse", id: created.id });
+      elements.createWarehouseForm.reset();
+      await loadWarehouses();
+      renderAll();
+    } catch (error) {
+      showApiOutput(`Create warehouse error: ${error.message}`);
     }
   });
 
@@ -739,6 +797,16 @@ function bindEvents() {
       showApiOutput(error.message);
     }
   });
+  elements.warehousesBtn.addEventListener("click", async () => {
+    try {
+      await loadWarehouses();
+      renderAll();
+      showApiOutput("/warehouses aggiornato");
+    } catch (error) {
+      showApiOutput(error.message);
+    }
+  });
+
   elements.assignmentsBtn.addEventListener("click", async () => {
     try {
       await loadAssignments();

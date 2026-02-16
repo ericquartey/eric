@@ -14,7 +14,10 @@ export class MachinesService {
   findAll(projectId?: string) {
     return this.prisma.machine.findMany({
       where: projectId ? { projectId } : undefined,
-      include: { project: { select: { id: true, name: true } } },
+      include: {
+        project: { select: { id: true, name: true } },
+        warehouse: { select: { id: true, name: true, location: true } },
+      },
       orderBy: { createdAt: 'desc' },
     });
   }

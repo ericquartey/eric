@@ -142,6 +142,7 @@
               <button id="issuesBtn" class="btn ghost">Issues</button>
               <button id="reportsBtn" class="btn ghost">Reports</button>
               <button id="assignmentsBtn" class="btn ghost">Assignments</button>
+              <button id="warehousesBtn" class="btn ghost">Magazzini</button>
               <button id="meBtn" class="btn ghost">/users/me</button>
             </div>
           </div>
@@ -165,6 +166,10 @@
             <article class="table-card">
               <h4>Assignments</h4>
               <div id="assignmentsTable" class="table-wrap"></div>
+            </article>
+            <article class="table-card">
+              <h4>Magazzini (EUR / USD)</h4>
+              <div id="warehousesTable" class="table-wrap"></div>
             </article>
           </div>
         </section>
@@ -201,6 +206,8 @@
                 <label class="field"><span>Model</span><input name="model" type="text" required /></label>
                 <label class="field"><span>Serial</span><input name="serialNumber" type="text" required /></label>
                 <label class="field"><span>Project</span><select id="machineProjectId" name="projectId" required></select></label>
+                <label class="field"><span>Magazzino</span><select id="machineWarehouseId" name="warehouseId"></select></label>
+                <label class="field"><span>Valore EUR</span><input name="valueEur" type="number" min="0" step="0.01" /></label>
                 <label class="field">
                   <span>Status</span>
                   <select name="installationStatus">
@@ -263,6 +270,15 @@
               </form>
             </article>
 
+
+            <article class="action-card">
+              <h4>Crea Magazzino</h4>
+              <form id="createWarehouseForm" class="form compact">
+                <label class="field"><span>Nome</span><input name="name" type="text" required /></label>
+                <label class="field"><span>Posizione</span><input name="location" type="text" required /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
             <article class="action-card">
               <h4>Aggiorna issue status</h4>
               <form id="updateIssueStatusForm" class="form compact">
