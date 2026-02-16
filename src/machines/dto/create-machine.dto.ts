@@ -1,4 +1,5 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 import { MachineInstallStatus } from '@prisma/client';
 
 export class CreateMachineDto {
@@ -10,6 +11,15 @@ export class CreateMachineDto {
 
   @IsString()
   projectId!: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  valueEur?: number;
 
   @IsOptional()
   @IsEnum(MachineInstallStatus)
