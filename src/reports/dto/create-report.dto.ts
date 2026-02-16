@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { InstallOutcome } from '@prisma/client';
 
 export class CreateReportDto {
@@ -10,6 +10,10 @@ export class CreateReportDto {
 
   @IsEnum(InstallOutcome)
   outcome!: InstallOutcome;
+
+  @IsOptional()
+  @IsDateString()
+  date?: string;
 
   @IsOptional()
   @IsString()
