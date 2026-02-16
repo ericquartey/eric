@@ -13,6 +13,7 @@ import { ReportsModule } from './reports/reports.module';
 import { IssuesModule } from './issues/issues.module';
 import { ChatModule } from './chat/chat.module';
 import { AttachmentsModule } from './attachments/attachments.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AttachmentsModule } from './attachments/attachments.module';
     IssuesModule,
     ChatModule,
     AttachmentsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
