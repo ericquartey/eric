@@ -8,10 +8,11 @@ $ErrorActionPreference = "Stop"
 
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $RuntimeDir = Join-Path $ProjectRoot ".runtime"
-$PidFile = Join-Path $RuntimeDir "dev-server.pid"
-$OutLog = Join-Path $RuntimeDir "dev-server.out.log"
-$ErrLog = Join-Path $RuntimeDir "dev-server.err.log"
-$HealthUrl = "http://localhost:$Port/api/health"
+$BackendPidFile = Join-Path $RuntimeDir "dev-server.pid"
+$BackendOutLog = Join-Path $RuntimeDir "dev-server.out.log"
+$BackendErrLog = Join-Path $RuntimeDir "dev-server.err.log"
+$BackendHealthUrl = "http://localhost:$Port/api/health"
+$FrontendUrl = "http://localhost:$Port/app/"
 
 function Ensure-RuntimeDir {
   if (-not (Test-Path $RuntimeDir)) {
@@ -19,30 +20,30 @@ function Ensure-RuntimeDir {
   }
 }
 
-function Get-ServerProcess {
-  if (-not (Test-Path $PidFile)) {
+function Get-ManagedProcess([string]$PidFilePath) {
+  if (-not (Test-Path $PidFilePath)) {
     return $null
   }
 
-  $storedPid = Get-Content $PidFile -ErrorAction SilentlyContinue
+  $storedPid = Get-Content $PidFilePath -ErrorAction SilentlyContinue
   if (-not $storedPid) {
-    Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
+    Remove-Item $PidFilePath -Force -ErrorAction SilentlyContinue
     return $null
   }
 
   $proc = Get-Process -Id ([int]$storedPid) -ErrorAction SilentlyContinue
   if (-not $proc) {
-    Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
+    Remove-Item $PidFilePath -Force -ErrorAction SilentlyContinue
     return $null
   }
 
   return $proc
 }
 
-function Get-ListenerPid {
+function Get-ListenerPid([int]$LocalPort) {
   $line = netstat -ano |
     Select-String -Pattern "LISTENING" |
-    Where-Object { $_.Line -match ":$Port\s" } |
+    Where-Object { $_.Line -match ":$LocalPort\s" } |
     Select-Object -First 1
 
   if (-not $line) {
@@ -57,111 +58,112 @@ function Get-ListenerPid {
   return [int]$parts[-1]
 }
 
-function Test-Health {
+function Test-Url([string]$Url) {
   try {
-    $response = Invoke-WebRequest -UseBasicParsing -Uri $HealthUrl -TimeoutSec 2
+    $response = Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec 2
     return $response.StatusCode -eq 200
   } catch {
     return $false
   }
 }
 
-function Start-Server {
-  Ensure-RuntimeDir
-
-  $existing = Get-ServerProcess
-  if ($existing) {
-    Write-Host "Server already running (PID=$($existing.Id))."
+function Stop-ByPidFileOrPort([string]$PidFilePath, [int]$LocalPort, [string]$Name) {
+  $proc = Get-ManagedProcess $PidFilePath
+  if ($proc) {
+    Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+    Remove-Item $PidFilePath -Force -ErrorAction SilentlyContinue
+    Write-Host "$Name stopped (PID=$($proc.Id))."
     return
   }
 
-  $listenerPid = Get-ListenerPid
+  $listenerPid = Get-ListenerPid $LocalPort
   if ($listenerPid) {
-    throw "Port $Port is already in use by PID $listenerPid. Stop it first or use another port."
+    Stop-Process -Id $listenerPid -Force -ErrorAction SilentlyContinue
+    Write-Host "$Name listener stopped on port $LocalPort (PID=$listenerPid)."
+    return
   }
+}
 
-  if (Test-Path $OutLog) { Remove-Item $OutLog -Force -ErrorAction SilentlyContinue }
-  if (Test-Path $ErrLog) { Remove-Item $ErrLog -Force -ErrorAction SilentlyContinue }
-
+function Start-Backend {
+  $existing = Get-ListenerPid $Port
+  if ($existing) {
+    Set-Content -Path $BackendPidFile -Value "$existing"
+    Write-Host "Backend already running (PID=$existing)."
+    return
+  }
+  if (Test-Path $BackendOutLog) { Remove-Item $BackendOutLog -Force -ErrorAction SilentlyContinue }
+  if (Test-Path $BackendErrLog) { Remove-Item $BackendErrLog -Force -ErrorAction SilentlyContinue }
   $proc = Start-Process -FilePath "cmd.exe" `
     -ArgumentList "/c npm run start:dev" `
     -WorkingDirectory $ProjectRoot `
-    -RedirectStandardOutput $OutLog `
-    -RedirectStandardError $ErrLog `
+    -RedirectStandardOutput $BackendOutLog `
+    -RedirectStandardError $BackendErrLog `
     -PassThru
-
-  Set-Content -Path $PidFile -Value "$($proc.Id)"
-
+  Set-Content -Path $BackendPidFile -Value "$($proc.Id)"
   for ($i = 0; $i -lt 30; $i++) {
     Start-Sleep -Seconds 1
-
     $runningProc = Get-Process -Id $proc.Id -ErrorAction SilentlyContinue
     if (-not $runningProc) {
-      Write-Host "Server process exited early. Last log lines:"
-      if (Test-Path $OutLog) { Get-Content $OutLog -Tail 20 }
-      if (Test-Path $ErrLog) { Get-Content $ErrLog -Tail 20 }
-      Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
-      throw "Server failed to stay running."
+      Write-Host "Backend process exited early. Last log lines:"
+      if (Test-Path $BackendOutLog) { Get-Content $BackendOutLog -Tail 20 }
+      if (Test-Path $BackendErrLog) { Get-Content $BackendErrLog -Tail 20 }
+      Remove-Item $BackendPidFile -Force -ErrorAction SilentlyContinue
+      throw "Backend failed to stay running."
     }
-
-    if (Test-Health) {
-      $listenerPid = Get-ListenerPid
+    if (Test-Url $BackendHealthUrl) {
+      $listenerPid = Get-ListenerPid $Port
       if ($listenerPid) {
-        Set-Content -Path $PidFile -Value "$listenerPid"
-        Write-Host "Server started. PID=$listenerPid"
+        Set-Content -Path $BackendPidFile -Value "$listenerPid"
+        Write-Host "Backend started. PID=$listenerPid"
       } else {
-        Write-Host "Server started. PID=$($proc.Id)"
+        Write-Host "Backend started. PID=$($proc.Id)"
       }
-      Write-Host "Health: $HealthUrl"
-      Write-Host "Logs: $OutLog"
+      Write-Host "Backend health: $BackendHealthUrl"
+      Write-Host "Backend logs: $BackendOutLog"
       return
     }
   }
+  Write-Host "Backend started (PID=$($proc.Id)) but healthcheck is not ready yet."
+}
 
-  Write-Host "Server started (PID=$($proc.Id)) but healthcheck is not ready yet."
-  Write-Host "Check logs: $OutLog"
+function Start-Server {
+  Ensure-RuntimeDir
+  Start-Backend
+  Write-Host "Frontend URL (served by backend): $FrontendUrl"
 }
 
 function Stop-Server {
-  $proc = Get-ServerProcess
-  if (-not $proc) {
-    $listenerPid = Get-ListenerPid
-    if ($listenerPid) {
-      Stop-Process -Id $listenerPid -Force -ErrorAction SilentlyContinue
-      Write-Host "Stopped listener on port $Port (PID=$listenerPid)."
-      return
-    }
-
-    Write-Host "Server is not running."
-    return
-  }
-
-  Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-  Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
-  Write-Host "Server stopped (PID=$($proc.Id))."
+  Stop-ByPidFileOrPort $BackendPidFile $Port "Backend"
 }
 
 function Show-Status {
-  $proc = Get-ServerProcess
-  $listenerPid = Get-ListenerPid
-  $healthy = Test-Health
+  $backendProc = Get-ManagedProcess $BackendPidFile
+  $backendListenerPid = Get-ListenerPid $Port
+  $backendHealthy = Test-Url $BackendHealthUrl
+  $frontendHealthy = Test-Url $FrontendUrl
 
-  if ($proc) {
-    Write-Host "Managed process: running (PID=$($proc.Id))"
+  if ($backendProc) {
+    Write-Host "Backend managed process: running (PID=$($backendProc.Id))"
   } else {
-    Write-Host "Managed process: not running"
+    Write-Host "Backend managed process: not running"
   }
 
-  if ($listenerPid) {
-    Write-Host "Port ${Port}: listening (PID=$listenerPid)"
+  if ($backendListenerPid) {
+    Write-Host "Backend port ${Port}: listening (PID=$backendListenerPid)"
   } else {
-    Write-Host "Port ${Port}: not listening"
+    Write-Host "Backend port ${Port}: not listening"
   }
 
-  if ($healthy) {
-    Write-Host "Health: OK ($HealthUrl)"
+  if ($backendHealthy) {
+    Write-Host "Backend health: OK ($BackendHealthUrl)"
   } else {
-    Write-Host "Health: not reachable ($HealthUrl)"
+    Write-Host "Backend health: not reachable ($BackendHealthUrl)"
+  }
+
+  if ($frontendHealthy) {
+    Write-Host "Frontend route: OK ($FrontendUrl)"
+  } else {
+    Write-Host "Frontend route: not reachable ($FrontendUrl)"
   }
 }
 
@@ -172,11 +174,12 @@ switch ($Action) {
   "status" { Show-Status; break }
   "logs" {
     Ensure-RuntimeDir
-    if (-not (Test-Path $OutLog)) {
-      Write-Host "No log file found at $OutLog"
+    if (-not (Test-Path $BackendOutLog)) {
+      Write-Host "No backend log file found at $BackendOutLog"
       break
     }
-    Get-Content $OutLog -Wait
+    Write-Host "Following backend logs: $BackendOutLog"
+    Get-Content $BackendOutLog -Wait
     break
   }
 }

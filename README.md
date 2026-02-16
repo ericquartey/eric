@@ -65,6 +65,10 @@ npm run dev:server:restart
 npm run dev:server:stop
 ```
 
+Con il backend avviato, il frontend statico viene servito automaticamente su:
+
+- `http://localhost:3000/app/`
+
 ## Run tests
 
 ```bash

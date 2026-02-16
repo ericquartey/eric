@@ -11,6 +11,9 @@ async function bootstrap() {
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads',
   });
+  app.useStaticAssets(join(process.cwd(), 'frontend'), {
+    prefix: '/app',
+  });
 
   app.getHttpAdapter().get('/', (_req: unknown, res: { json: (body: unknown) => void }) => {
     res.json({

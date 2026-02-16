@@ -11,6 +11,9 @@ async function bootstrap() {
     app.useStaticAssets((0, path_1.join)(process.cwd(), 'uploads'), {
         prefix: '/uploads',
     });
+    app.useStaticAssets((0, path_1.join)(process.cwd(), 'frontend'), {
+        prefix: '/app',
+    });
     app.getHttpAdapter().get('/', (_req, res) => {
         res.json({
             service: 'ferretto-installations-backend',

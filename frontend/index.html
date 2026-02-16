@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ferretto Command Center</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-stripe bg-stripe-a"></div>
+    <div class="bg-stripe bg-stripe-b"></div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo-badge">F</div>
+          <div>
+            <p class="overline">Ferretto</p>
+            <h1>Command Center</h1>
+          </div>
+        </div>
+        <nav class="menu">
+          <a href="#dashboard">Dashboard</a>
+          <a href="#operations">Operations</a>
+          <a href="#datahub">Data Hub</a>
+          <a href="#control">Control Room</a>
+        </nav>
+        <div class="side-card">
+          <p class="side-title">Endpoint</p>
+          <label class="field compact">
+            <span>API Base</span>
+            <input id="apiBase" type="text" />
+          </label>
+          <button id="saveApiBtn" class="btn ghost">Salva endpoint</button>
+        </div>
+        <div class="side-card">
+          <p class="side-title">Sessione</p>
+          <p id="tokenState" class="tiny">Non autenticato</p>
+          <button id="logoutBtn" class="btn ghost">Logout</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar panel" id="dashboard">
+          <div>
+            <p class="overline">Ferretto Operations</p>
+            <h2>Cruscotto installazioni e cantieri</h2>
+            <p class="lead">Monitoraggio live dei flussi operativi con azioni rapide.</p>
+          </div>
+          <div class="toolbar">
+            <div id="healthBadge" class="pill neutral">Health: sconosciuto</div>
+            <label class="toggle">
+              <input id="autoRefreshToggle" type="checkbox" />
+              <span>Auto refresh 30s</span>
+            </label>
+            <button id="healthBtn" class="btn primary">Health check</button>
+            <button id="refreshAllBtn" class="btn primary">Aggiorna tutto</button>
+            <button id="exportBtn" class="btn secondary">Export snapshot</button>
+          </div>
+        </header>
+
+        <section class="kpi-grid">
+          <article class="kpi panel">
+            <p>Projects</p>
+            <strong id="projectsCount">0</strong>
+            <small id="projectsDelta">In corso: 0</small>
+          </article>
+          <article class="kpi panel">
+            <p>Machines</p>
+            <strong id="machinesCount">0</strong>
+            <small id="installedRate">Installate: 0%</small>
+          </article>
+          <article class="kpi panel">
+            <p>Issues Aperte</p>
+            <strong id="openIssuesCount">0</strong>
+            <small id="criticalHint">Richiedono intervento PM/ADMIN</small>
+          </article>
+          <article class="kpi panel">
+            <p>Reports Oggi</p>
+            <strong id="reportsTodayCount">0</strong>
+            <small id="assignmentsHint">Assegnazioni pianificate: 0</small>
+          </article>
+        </section>
+
+        <section class="operations panel" id="operations">
+          <div class="section-head">
+            <h3>Operations Board</h3>
+            <label class="field compact">
+              <span>Ricerca globale</span>
+              <input id="globalSearch" type="text" placeholder="project, macchina, issue..." />
+            </label>
+          </div>
+          <div class="ops-grid">
+            <article class="ops-card">
+              <h4>Issue Kanban</h4>
+              <div id="issuesKanban" class="kanban"></div>
+            </article>
+            <article class="ops-card">
+              <h4>Timeline assegnazioni</h4>
+              <div id="assignmentsTimeline" class="timeline"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel auth-panel">
+          <div class="auth-grid">
+            <article>
+              <h3>Login</h3>
+              <form id="loginForm" class="form">
+                <label class="field"><span>Email</span><input name="email" type="email" required /></label>
+                <label class="field"><span>Password</span><input name="password" type="password" required /></label>
+                <button class="btn primary" type="submit">Accedi</button>
+              </form>
+            </article>
+            <article>
+              <h3>Registrazione utente</h3>
+              <form id="registerForm" class="form">
+                <label class="field"><span>Nome</span><input name="firstName" type="text" required /></label>
+                <label class="field"><span>Cognome</span><input name="lastName" type="text" required /></label>
+                <label class="field"><span>Email</span><input name="email" type="email" required /></label>
+                <label class="field"><span>Password</span><input name="password" type="password" minlength="8" required /></label>
+                <label class="field">
+                  <span>Ruolo</span>
+                  <select name="role">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="PM">PM</option>
+                    <option value="INSTALLER">INSTALLER</option>
+                  </select>
+                </label>
+                <button class="btn secondary" type="submit">Crea utente</button>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel datahub" id="datahub">
+          <div class="section-head">
+            <h3>Data Hub</h3>
+            <div class="mini-actions">
+              <button id="projectsBtn" class="btn ghost">Projects</button>
+              <button id="machinesBtn" class="btn ghost">Machines</button>
+              <button id="issuesBtn" class="btn ghost">Issues</button>
+              <button id="reportsBtn" class="btn ghost">Reports</button>
+              <button id="assignmentsBtn" class="btn ghost">Assignments</button>
+              <button id="meBtn" class="btn ghost">/users/me</button>
+            </div>
+          </div>
+          <div class="tables-grid">
+            <article class="table-card">
+              <h4>Projects</h4>
+              <div id="projectsTable" class="table-wrap"></div>
+            </article>
+            <article class="table-card">
+              <h4>Machines</h4>
+              <div id="machinesTable" class="table-wrap"></div>
+            </article>
+            <article class="table-card">
+              <h4>Issues</h4>
+              <div id="issuesTable" class="table-wrap"></div>
+            </article>
+            <article class="table-card">
+              <h4>Reports</h4>
+              <div id="reportsTable" class="table-wrap"></div>
+            </article>
+            <article class="table-card">
+              <h4>Assignments</h4>
+              <div id="assignmentsTable" class="table-wrap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel control" id="control">
+          <div class="section-head">
+            <h3>Control Room - Azioni operative</h3>
+          </div>
+          <div class="control-grid">
+            <article class="action-card">
+              <h4>Crea Project</h4>
+              <form id="createProjectForm" class="form compact">
+                <label class="field"><span>Nome</span><input name="name" type="text" required /></label>
+                <label class="field"><span>Cliente</span><input name="customer" type="text" required /></label>
+                <label class="field"><span>Location</span><input name="location" type="text" required /></label>
+                <label class="field"><span>Start date</span><input name="startDate" type="date" required /></label>
+                <label class="field"><span>End date</span><input name="expectedEndDate" type="date" /></label>
+                <label class="field">
+                  <span>Status</span>
+                  <select name="status">
+                    <option value="SCHEDULED">SCHEDULED</option>
+                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                  </select>
+                </label>
+                <label class="field"><span>PM Id</span><input id="projectPmId" name="pmId" type="text" required /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
+
+            <article class="action-card">
+              <h4>Crea Machine</h4>
+              <form id="createMachineForm" class="form compact">
+                <label class="field"><span>Model</span><input name="model" type="text" required /></label>
+                <label class="field"><span>Serial</span><input name="serialNumber" type="text" required /></label>
+                <label class="field"><span>Project</span><select id="machineProjectId" name="projectId" required></select></label>
+                <label class="field">
+                  <span>Status</span>
+                  <select name="installationStatus">
+                    <option value="NOT_STARTED">NOT_STARTED</option>
+                    <option value="PARTIAL">PARTIAL</option>
+                    <option value="INSTALLED">INSTALLED</option>
+                    <option value="BLOCKED">BLOCKED</option>
+                  </select>
+                </label>
+                <label class="field"><span>Note</span><input name="notes" type="text" /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
+
+            <article class="action-card">
+              <h4>Crea Issue</h4>
+              <form id="createIssueForm" class="form compact">
+                <label class="field">
+                  <span>Tipo</span>
+                  <select name="type">
+                    <option value="MISSING">MISSING</option>
+                    <option value="PROBLEM">PROBLEM</option>
+                    <option value="ANOMALY">ANOMALY</option>
+                  </select>
+                </label>
+                <label class="field"><span>Descrizione</span><input name="description" type="text" required /></label>
+                <label class="field"><span>Project</span><select id="issueProjectId" name="projectId" required></select></label>
+                <label class="field"><span>Machine</span><select id="issueMachineId" name="machineId"></select></label>
+                <label class="field"><span>Assignee Id</span><input name="assigneeId" type="text" /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
+
+            <article class="action-card">
+              <h4>Crea Assignment</h4>
+              <form id="createAssignmentForm" class="form compact">
+                <label class="field"><span>Project</span><select id="assignmentProjectId" name="projectId" required></select></label>
+                <label class="field"><span>Installer Id</span><input name="installerId" type="text" required /></label>
+                <label class="field"><span>Start date</span><input name="startDate" type="date" required /></label>
+                <label class="field"><span>End date</span><input name="endDate" type="date" /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
+
+            <article class="action-card">
+              <h4>Crea Report</h4>
+              <form id="createReportForm" class="form compact">
+                <label class="field"><span>Project</span><select id="reportProjectId" name="projectId" required></select></label>
+                <label class="field"><span>Machine</span><select id="reportMachineId" name="machineId" required></select></label>
+                <label class="field">
+                  <span>Outcome</span>
+                  <select name="outcome">
+                    <option value="OK">OK</option>
+                    <option value="KO">KO</option>
+                    <option value="PARTIAL">PARTIAL</option>
+                  </select>
+                </label>
+                <label class="field"><span>Note</span><input name="notes" type="text" /></label>
+                <button class="btn secondary" type="submit">Crea</button>
+              </form>
+            </article>
+
+            <article class="action-card">
+              <h4>Aggiorna issue status</h4>
+              <form id="updateIssueStatusForm" class="form compact">
+                <label class="field"><span>Issue</span><select id="updateIssueId" name="issueId" required></select></label>
+                <label class="field">
+                  <span>Status</span>
+                  <select name="status">
+                    <option value="OPEN">OPEN</option>
+                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                    <option value="RESOLVED">RESOLVED</option>
+                    <option value="CLOSED">CLOSED</option>
+                  </select>
+                </label>
+                <button class="btn secondary" type="submit">Aggiorna</button>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel logs">
+          <div class="split">
+            <article>
+              <h4>Utente corrente</h4>
+              <pre id="meOutput">Nessun dato</pre>
+            </article>
+            <article>
+              <h4>Log API</h4>
+              <pre id="apiOutput">Nessuna chiamata</pre>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
